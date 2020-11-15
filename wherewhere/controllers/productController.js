@@ -1,5 +1,5 @@
 const express = require('express');
-const userProductModel = require('../models/userProductModel');
+const userProductModel = require('../models/productModel');
 
 module.exports = {
     register: async(req, res)=>{

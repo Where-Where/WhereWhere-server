@@ -1,12 +1,9 @@
 const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
-    productIdx: {type: String, required: true},/**자동생성 -> 어떻게 함? */
     siteUrl: {type: String, required: true},
-    img: {type: String, required: false},
-    resizedImg: {type: String, required: false},
-    video: {type: String, required: false},
-    resizedVideo: {type: String, required: false},
+    dataUrl: {type: String, required: false},
+    resizedDataUrl: {type: String, required: false},
     date: {type: Date, required: true},/**가져온 일자 */
     title: {type: String, required: true},
     description: {type: String, required: true},
@@ -24,8 +21,6 @@ const productSchema = new mongoose.Schema({
      * 우리가 추천하는 거라면 recommend, sponsor에 정보 입력
      */
     userIdx: {type: mongoose.SchemaTypes.ObjectId, ref: "users", required: false},
-    recommend: {type: String, required: false},
-    sponsor: {type: String, required: false}
 });
 
 productSchema.statics.register = function(payload){
