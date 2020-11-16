@@ -27,6 +27,27 @@ module.exports = {
             console.log('google signIn verify ERROR : ', err);
         }
     },
+    facebookSignIn: async(req, res)=>{
+        /**
+         * 확실하지 않은 코드
+         */
+        const code = req.query.code;//이 code로 accessToken 발급받아야함
+        /**
+        https://graph.facebook.com/v2.11/oauth/access_token?
+        client_id={app-id} // app ID
+        &redirect_uri={redirect-uri} // 처음 등록할 때 redirect uri와 동일하게
+        &client_secret={app-secret} // 앱 시크릿 코드
+        &code={code-parameter} // 전달받은 code 변수
+         */
+        
+
+
+
+
+    },
+    appleSignIn: async(req, res)=>{
+
+    },
     createUser: async(req, res)=>{
         try{
             //const {userIdx, sns_category, token, refresh_token, signup_date} = req.body;
