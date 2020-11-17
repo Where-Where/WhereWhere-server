@@ -1,11 +1,11 @@
 const express = require('express');
 const userModel = require('../models/userModel');
-const googleInfo = require('../config/googleInfo.json');
-const {OAuth2Client} = require('google-auth-library');
+const signInModel = require('../models/signinModel');
+const jwt = require('jsonwebtoken');
 
 module.exports = {
     googleSignIn: async(req, res)=>{
-        const token = req.body.id_token;//맞는 형식인지 확인
+        /*
         const CLIENT_ID = googleInfo.CLIENT_ID;
         const client = new OAuth2Client(CLIENT_ID);
         const verify = async ()=>{
@@ -14,17 +14,21 @@ module.exports = {
                 audience: CLIENT_ID
             });
             const payload = ticket.getPayload();
-            /**
-             * userid가 뭔지 찍어보기..
-             */
-            const userid = payload['sub'];
-            console.log('userid : ', userid);
         }
+        */
+        const token = req.body.id_token;//맞는 형식인지 확인
         try{
-            await verify();
-            
+            const payload = await signInModel.verifyGoogleSignIn(token);
+            /**
+             * payload가 비어있을 때 오류처리 해줘야 함.
+             */
+            console.log('google payload : ', payload);
+            /**
+             * 사용자 가입?
+             */
         }catch(err){
             console.log('google signIn verify ERROR : ', err);
+            return; // 비정상 종료
         }
     },
     facebookSignIn: async(req, res)=>{
@@ -46,6 +50,44 @@ module.exports = {
 
     },
     appleSignIn: async(req, res)=>{
+        const { provider, response } = req.body;
+        if(provider === 'apple'){
+            const { identityToken, user } = response.response;
+            const json = jwt.decode(identityToken, { complete: true});
+            const kid = json.header.kid;
+            const appleKey = await signInModel.getAppleSignInKeys(kid)
+            if(!appleKey){
+                console.error('apple sign in error');
+                return// 비정상 종료
+            }
+            const payload = await signInModel.verifyJWT(identityToken, appleKey);
+            if(!payload){
+                console.error('payload error');
+                return;
+            }
+            console.log('payload : ', payload);
+            /**
+             * payload 형태
+             * {
+                    "iss": "https://appleid.apple.com",
+                    "aud": "com.sarunw.siwa",
+                    "exp": 1577943613,
+                    "iat": 1577943013,
+                    "sub": "xxx.yyy.zzz",
+                    "nonce": "nounce",
+                    "c_hash": "xxxx",
+                    "email": "xxxx@privaterelay.appleid.com",
+                    "email_verified": "true",
+                    "is_private_email": "true",
+                    "auth_time": 1577943013
+                }
+             */
+            // 마지막으로 확인
+            if(payload.sub === user && payload.aud === 'package Name'){
+                //correct user
+                //user is legit  and completely valid 
+            }
+        }
 
     },
     createUser: async(req, res)=>{

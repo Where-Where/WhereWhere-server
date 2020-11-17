@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
  * schema에 어긋나는 데이터가 있으면 에러를 발생시킨다.
  */
 const userSchema = new mongoose.Schema({
-    sns_category: {type: String, required: true},
+    sns_category: {type: String, enum: ['google', 'facebook', 'apple'], required: true},
     token: {type: String, required: true},
     refresh_token: {type: String, required: true},
     signup_date: {type: Date, required: true, default: Date.now}
