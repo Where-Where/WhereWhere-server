@@ -5,6 +5,7 @@ module.exports = {
     getVideoInfo: async (inputPath) => {
         try{
             ffmpeg.ffprobe(inputPath, (err, videoInfo)=>{
+                /**에러처리 해야함 */
                 const {duration, size} = videoInfo.format;
                 return {size, durationInSeconds : Math.floor(duration)};
             });

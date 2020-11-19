@@ -1,10 +1,20 @@
 const mongoose = require('mongoose');
+const moment = require('moment');
+require('moment-timezone');
+moment.tz.setDefault('Asia/Seoul');
+var date = moment().format('YYYY-MM-DD HH:mm:ss');
 
 const productSchema = new mongoose.Schema({
     siteUrl: {type: String, required: true},
-    dataUrl: {type: String, required: false},
-    resizedDataUrl: {type: String, required: false},
-    date: {type: Date, required: true},/**가져온 일자 */
+    dataUrl: [{
+        category: {type: String, required: true},
+        url: {type: String, required: true}
+    }],
+    resizedDataUrl: [{
+        category: {type: String, required: true},
+        url: {type: String, required: true}
+    }],
+    date: {type: String, default: date},/**가져온 일자 */
     title: {type: String, required: true},
     description: {type: String, required: true},
     plural: {type: Boolean, required: true},
@@ -12,27 +22,28 @@ const productSchema = new mongoose.Schema({
      * 이미지, 동영상 여러개 : true
      * 하나만 존재 : false
      */
-    mainCategory: {type: Number, required: true},
-    subCategory: {type: Number, required: true},
-    importance: {type: Number, default: 0},
-    like: {type: Boolean, default:0},/**원래 값은 0 -> 삭제하면 지우지 않고 1로 바뀜*/
-    /**
-     * 직접 저장했다면 userIdx
-     * 우리가 추천하는 거라면 recommend, sponsor에 정보 입력
-     */
-    userIdx: {type: mongoose.SchemaTypes.ObjectId, ref: "users", required: false},
+    mainCategory: {type: Number, required: true, default: 1},
+    subCategory: {type: Number, required: true, default: 3},
+    importance: {type: Number, default: 0},// 중요도 -> 하트 클릭(1)/ default (0)
+    like: {type: Boolean, default:false},// 삭제하면 (true)/ default (false)
+    userIdx: {type: mongoose.Schema.Types.ObjectId, ref: "user", required: false},
 });
 
 productSchema.statics.register = function(payload){
-    const user = new this(payload);
-    return user.save();
+    const product = new this(payload);
+    return product.save();
 };
 
-/**
- * 데이터 가져오는건데 이거 맞나
- */
-productSchema.statics.showProductsByCategory = function(userIdx, categoryIdx){
-    return this.find().equals('userIdx', userIdx).equals('categoryIdx', categoryIdx);
-}
+productSchema.statics.showAll = function(){
+    return this.find().populate("userIdx");
+};
+
+productSchema.statics.showProductsBySubCategory = function(userIdx, subCategoryIdx){
+    return this.find()
+                .where('subCategory').equals(subCategoryIdx)
+                .where('like').equals(false)
+                .where('userIdx').equals(userIdx)
+                .populate('userIdx');
+};
 
 module.exports = mongoose.model('userProduct', productSchema);

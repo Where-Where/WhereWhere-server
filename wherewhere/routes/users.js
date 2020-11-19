@@ -2,9 +2,10 @@ var express = require('express');
 const userController = require('../controllers/userController');
 var router = express.Router();
 
-/**
- * 콜백 url에 맞게 수정해야 할 듯.
- */
+//더미데이터 집어넣기용 api
+router.post('/create', userController.createUser);
+
+
 router.post('/google', userController.googleSignIn);
 
 router.post('/facebook', userController.facebookSignIn);

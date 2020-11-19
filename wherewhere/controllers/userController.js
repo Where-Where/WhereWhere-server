@@ -2,52 +2,75 @@ const express = require('express');
 const userModel = require('../models/userModel');
 const signInModel = require('../models/signinModel');
 const jwt = require('jsonwebtoken');
+const admin = require('firebase-admin');
+const serviceAccount = require('../config/wherewhere-1b2ed-firebase-adminsdk-wvlc0-56b02093ac.json');
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://wherewhere-1b2ed.firebaseio.com"
+});
 
 module.exports = {
     googleSignIn: async(req, res)=>{
-        /*
-        const CLIENT_ID = googleInfo.CLIENT_ID;
-        const client = new OAuth2Client(CLIENT_ID);
-        const verify = async ()=>{
-            const ticket = await client.verifyIdToken({
-                idToken: token,
-                audience: CLIENT_ID
-            });
-            const payload = ticket.getPayload();
-        }
-        */
-        const token = req.body.id_token;//맞는 형식인지 확인
         try{
-            const payload = await signInModel.verifyGoogleSignIn(token);
-            /**
-             * payload가 비어있을 때 오류처리 해줘야 함.
-             */
-            console.log('google payload : ', payload);
-            /**
-             * 사용자 가입?
-             */
+            //더미데이터용
+            const uid = req.body.uid;
+            //여기 싹 다 주석 풀기(위에 uid 지우기)
+            //const idToken = req.body.idToken;
+            //const decodedToken = await admin.auth().verifyIdToken(idToken);
+            //console.log('decodedToken : ', decodedToken);
+            //let uid = decodedToken.uid;
+            //console.log('uid : ', uid);
+            //const result = await userModel.findByUid(uid);
+            const userByUid = await userModel.findByUid(uid).exec();
+            console.log('userByUid : ', userByUid);
+            if(userByUid === null){
+                /**없는 사용자 -> 회원가입 시키기 */
+                const newUser = await userModel.createUser({
+                    "sns_category":"google",
+                    "uid": uid,
+                    //"refresh_token": refreshToken,
+                });
+                console.log('new user : ', newUser);
+                res.send(newUser);
+            }else{
+                /**있는 사용자 -> 그냥 로그인 */
+                console.log("구글 - 기존에 있던 사용자");
+                res.send(userByUid);
+            }
         }catch(err){
-            console.log('google signIn verify ERROR : ', err);
-            return; // 비정상 종료
+            console.log('google signIn error : ', err);
+            return res.send('google signIn error');
         }
     },
     facebookSignIn: async(req, res)=>{
-        /**
-         * 확실하지 않은 코드
-         */
-        const code = req.query.code;//이 code로 accessToken 발급받아야함
-        /**
-        https://graph.facebook.com/v2.11/oauth/access_token?
-        client_id={app-id} // app ID
-        &redirect_uri={redirect-uri} // 처음 등록할 때 redirect uri와 동일하게
-        &client_secret={app-secret} // 앱 시크릿 코드
-        &code={code-parameter} // 전달받은 code 변수
-         */
-        
-
-
-
-
+        try{
+            const idToken = req.body.idToken;
+            const decodedToken = await admin.auth().verifyIdToken(idToken);
+            console.log('decodedToken : ', decodedToken);
+            let uid = decodedToken.uid;
+            console.log('uid : ', uid);
+            
+            const userByUid = await userModel.findByUid(uid).exec();
+            console.log('userByUid : ', userByUid);
+            if(userByUid === null){
+                /**없는 사용자 -> 회원가입 시키기 */
+                const newUser = await userModel.createUser({
+                    "sns_category":"facebook",
+                    "uid": uid,
+                    //"refresh_token": refreshToken,
+                });
+                console.log('new user : ', newUser);
+                res.send(newUser);
+            }else{
+                /**있는 사용자 -> 그냥 로그인 */
+                console.log("페이스북 - 기존에 있던 사용자");
+                res.send(userByUid);
+            }
+        }catch(err){
+            console.log('facebook signIn error : ', err);
+            return res.send('facebook signIn error');
+        }
     },
     appleSignIn: async(req, res)=>{
         const { provider, response } = req.body;
@@ -90,6 +113,7 @@ module.exports = {
         }
 
     },
+    /**더미데이터를 위한 임시 컨트롤러 */
     createUser: async(req, res)=>{
         try{
             //const {userIdx, sns_category, token, refresh_token, signup_date} = req.body;
