@@ -1,18 +1,33 @@
 const multer = require('multer');
 const multerS3 = require('multer-s3');
-const aws = require('aws-sdk');
-aws.config.loadFromPath(__dirname + '/../config/s3.json');
+const AWS = require('aws-sdk');
+AWS.config.loadFromPath(__dirname + '/../config/s3.json');
 
-const s3 = new aws.S3();
+// AWS.config.update({
+//     accessKeyId: process.env.S3_ACCESS_KEY_ID,
+//     secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+//     region: 'ap-northeast-2',
+//   });
 
 const upload = multer({
     storage: multerS3({
-        s3: s3,
-        bucket: '',
+        s3: new AWS.S3(),
+        bucket: 'wherewhere',
         acl: 'public-read',
-        key: function(req, file, cb){
-            cb(null, Date.now()+'.'+file.originalname.split('.').pop());
-        }
-    })
+        key(req, file, cb) {
+            cb(null, `original/${Date.now()}${path.basename(file.originalname)}`);
+          },
+    }),
+    limits: { fileSize: 5 * 1024 * 1024 },
 });
+// original폴더에 파일이 업로드되면 이미지 리사이징
+// original폴더 부분을 thumb로 교체
+router.post('/img', isLoggedIn, upload.single('img'), (req, res) => {
+    console.log(req.file);
+    const originalUrl = req.file.location;
+    const url = originalUrl.replace(/\/original\//, '/thumb/');
+    res.json({ url, originalUrl });
+  });
+
+  
 module.exports = upload;
