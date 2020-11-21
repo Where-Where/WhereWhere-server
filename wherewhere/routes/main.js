@@ -1,6 +1,9 @@
 var express = require('express');
 var router = express.Router();
 const productController = require('../controllers/productController');
+
+const ffmpegController = require('../controllers/ffmpegController');
+router.post('/video', ffmpegController.createFragmentPreview);
 //😈const upload = require('../modules/multer');
 
 /**상품 등록 */

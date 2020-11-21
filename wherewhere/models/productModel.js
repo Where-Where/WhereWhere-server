@@ -7,11 +7,11 @@ var date = moment().format('YYYY-MM-DD HH:mm:ss');
 const productSchema = new mongoose.Schema({
     siteUrl: {type: String, required: true},
     dataUrl: [{
-        category: {type: String, required: true},
+        category: {type: String, enum: ['image', 'video'], required: true},
         url: {type: String, required: true}
     }],
     resizedDataUrl: [{
-        category: {type: String, required: true},
+        category: {type: String, enum: ['image', 'video'], required: true},
         url: {type: String, required: true}
     }],
     date: {type: String, default: date},/**가져온 일자 */
