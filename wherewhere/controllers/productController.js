@@ -1,10 +1,10 @@
 const express = require('express');
-const userProductModel = require('../models/productModel');
+const productModel = require('../models/productModel');
 
 module.exports = {
     register: async(req, res)=>{
         try{
-            const result = await userProductModel.register(req.body);
+            const result = await productModel.register(req.body);
             return res.send(result);
         }catch(err){
             return res.status(500).send(err);
@@ -19,7 +19,7 @@ module.exports = {
          * 코드 수정해야 함.
          */
         try{
-            const result = await userProductModel.showProductsBySubCategory(userIdx, subCategoryIdx).exec();
+            const result = await productModel.showProductsBySubCategory(userIdx, subCategoryIdx).exec();
             return res.send(result);
         }catch(err){
             console.log(err);
@@ -39,14 +39,14 @@ module.exports = {
          * db에 넣으면 됨.
          * model의 파라미터 중 img에 imageLocations를 넣고
          * 나머지는 다 따로따로 넣어줘야할듯..?
-         * const result = await userProductModel.registerImgs(userIdx, productIdx, imageLocations);
+         * const result = await productModel.registerImgs(userIdx, productIdx, imageLocations);
          */
     },
     //테스트용
     showAll: async(req, res)=>{
         const userIdx = req.body.userIdx;
         try{
-            const result = await userProductModel.showAll().exec();
+            const result = await productModel.showAll().exec();
             console.log('result : ', result);
             return res.send(result);
         }catch(err){

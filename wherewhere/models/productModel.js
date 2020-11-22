@@ -26,7 +26,7 @@ const productSchema = new mongoose.Schema({
     subCategory: {type: Number, required: true, default: 3},
     importance: {type: Number, default: 0},// 중요도 -> 하트 클릭(1)/ default (0)
     like: {type: Boolean, default:false},// 삭제하면 (true)/ default (false)
-    userIdx: {type: mongoose.Schema.Types.ObjectId, ref: "user", required: false},
+    userIdx: {type: mongoose.Schema.Types.ObjectId, ref: "user", required: true},
 });
 
 productSchema.statics.register = function(payload){
