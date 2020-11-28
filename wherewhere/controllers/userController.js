@@ -1,9 +1,13 @@
-const express = require('express');
+//const express = require('express');
 const userModel = require('../models/userModel');
-const signInModel = require('../models/signinModel');
-const jwt = require('jsonwebtoken');
+//const signInModel = require('../models/signinModel');
+const jwt = require('../modules/jwt');
 const admin = require('firebase-admin');
 const serviceAccount = require('../config/wherewhere-1b2ed-firebase-adminsdk-wvlc0-56b02093ac.json');
+const statusCode = require('../modules/statusCode');
+const resMessage = require('../modules/resMessage');
+const sendMessage = require('../modules/sendMessage');
+const util = require('../modules/util');
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -13,13 +17,10 @@ admin.initializeApp({
 module.exports = {
     googleSignIn: async(req, res)=>{
         try{
-            //더미데이터용
-            const uid = req.body.uid;
-            //여기 싹 다 주석 풀기(위에 uid 지우기)
-            //const idToken = req.body.idToken;
-            //const decodedToken = await admin.auth().verifyIdToken(idToken);
+            const idToken = req.body.idToken;
+            const decodedToken = await admin.auth().verifyIdToken(idToken);
             //console.log('decodedToken : ', decodedToken);
-            //let uid = decodedToken.uid;
+            let uid = decodedToken.uid;
             //console.log('uid : ', uid);
             //const result = await userModel.findByUid(uid);
             const userByUid = await userModel.findByUid(uid).exec();
@@ -28,90 +29,93 @@ module.exports = {
                 /**없는 사용자 -> 회원가입 시키기 */
                 const newUser = await userModel.createUser({
                     "sns_category":"google",
-                    "uid": uid,
-                    //"refresh_token": refreshToken,
+                    "uid": uid
                 });
-                console.log('new user : ', newUser);
-                res.send(newUser);
+                console.log("구글 - 새로 회원가입한 사용자")
+                const {token, _} = await jwt.sign(newUser);
+                return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.CREATED_USER, {
+                    token : token
+                }));
             }else{
                 /**있는 사용자 -> 그냥 로그인 */
                 console.log("구글 - 기존에 있던 사용자");
-                res.send(userByUid);
+                const {token, _} = await jwt.sign(userByUid);
+                return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.LOGIN_SUCCESS, {
+                    token: token
+                }))
             }
         }catch(err){
             console.log('google signIn error : ', err);
-            return res.send('google signIn error');
+            return res.status(statusCode.DB_ERROR).send(util.fail(status.DB_ERROR, resMessage.DB_ERROR));
         }
     },
     facebookSignIn: async(req, res)=>{
         try{
             const idToken = req.body.idToken;
             const decodedToken = await admin.auth().verifyIdToken(idToken);
-            console.log('decodedToken : ', decodedToken);
+            //console.log('decodedToken : ', decodedToken);
             let uid = decodedToken.uid;
-            console.log('uid : ', uid);
-            
+            //console.log('uid : ', uid);
+            //const result = await userModel.findByUid(uid);
             const userByUid = await userModel.findByUid(uid).exec();
             console.log('userByUid : ', userByUid);
             if(userByUid === null){
                 /**없는 사용자 -> 회원가입 시키기 */
                 const newUser = await userModel.createUser({
                     "sns_category":"facebook",
-                    "uid": uid,
-                    //"refresh_token": refreshToken,
+                    "uid": uid
                 });
-                console.log('new user : ', newUser);
-                res.send(newUser);
+                console.log("페이스북 - 새로 회원가입한 사용자")
+                const {token, _} = await jwt.sign(newUser);
+                return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.CREATED_USER, {
+                    token : token
+                }));
             }else{
                 /**있는 사용자 -> 그냥 로그인 */
                 console.log("페이스북 - 기존에 있던 사용자");
-                res.send(userByUid);
+                const {token, _} = await jwt.sign(userByUid);
+                return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.LOGIN_SUCCESS, {
+                    token: token
+                }))
             }
         }catch(err){
             console.log('facebook signIn error : ', err);
-            return res.send('facebook signIn error');
+            return res.status(statusCode.DB_ERROR).send(util.fail(status.DB_ERROR, resMessage.DB_ERROR));
         }
     },
     appleSignIn: async(req, res)=>{
-        const { provider, response } = req.body;
-        if(provider === 'apple'){
-            const { identityToken, user } = response.response;
-            const json = jwt.decode(identityToken, { complete: true});
-            const kid = json.header.kid;
-            const appleKey = await signInModel.getAppleSignInKeys(kid)
-            if(!appleKey){
-                console.error('apple sign in error');
-                return// 비정상 종료
+        try{
+            const idToken = req.body.idToken;
+            const decodedToken = await admin.auth().verifyIdToken(idToken);
+            //console.log('decodedToken : ', decodedToken);
+            let uid = decodedToken.uid;
+            //console.log('uid : ', uid);
+            //const result = await userModel.findByUid(uid);
+            const userByUid = await userModel.findByUid(uid).exec();
+            console.log('userByUid : ', userByUid);
+            if(userByUid === null){
+                /**없는 사용자 -> 회원가입 시키기 */
+                const newUser = await userModel.createUser({
+                    "sns_category":"apple",
+                    "uid": uid
+                });
+                console.log("애플 - 새로 회원가입한 사용자")
+                const {token, _} = await jwt.sign(newUser);
+                return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.CREATED_USER, {
+                    token : token
+                }));
+            }else{
+                /**있는 사용자 -> 그냥 로그인 */
+                console.log("애플 - 기존에 있던 사용자");
+                const {token, _} = await jwt.sign(userByUid);
+                return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.LOGIN_SUCCESS, {
+                    token: token
+                }))
             }
-            const payload = await signInModel.verifyJWT(identityToken, appleKey);
-            if(!payload){
-                console.error('payload error');
-                return;
-            }
-            console.log('payload : ', payload);
-            /**
-             * payload 형태
-             * {
-                    "iss": "https://appleid.apple.com",
-                    "aud": "com.sarunw.siwa",
-                    "exp": 1577943613,
-                    "iat": 1577943013,
-                    "sub": "xxx.yyy.zzz",
-                    "nonce": "nounce",
-                    "c_hash": "xxxx",
-                    "email": "xxxx@privaterelay.appleid.com",
-                    "email_verified": "true",
-                    "is_private_email": "true",
-                    "auth_time": 1577943013
-                }
-             */
-            // 마지막으로 확인
-            if(payload.sub === user && payload.aud === 'package Name'){
-                //correct user
-                //user is legit  and completely valid 
-            }
+        }catch(err){
+            console.log('apple signIn error : ', err);
+            return res.status(statusCode.DB_ERROR).send(util.fail(status.DB_ERROR, resMessage.DB_ERROR));
         }
-
     },
     /**더미데이터를 위한 임시 컨트롤러 */
     createUser: async(req, res)=>{
@@ -119,7 +123,10 @@ module.exports = {
             //const {userIdx, sns_category, token, refresh_token, signup_date} = req.body;
             //const user = await userModel.createUser(userIdx, sns_category, token, refresh_token, signup_date);
             const result = await userModel.createUser(req.body);
-            return res.send(result);
+            console.log('create user result : ', result);
+            const {token, _} = await jwt.sign(result);
+            console.log("token : ", token);
+            return res.send({token: token});
         }catch(err){
             return res.status(500).send(err);
         }

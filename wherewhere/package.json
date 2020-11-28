@@ -11,6 +11,7 @@
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "^4.16.4",
+    "fb-video-downloader": "^1.0.3",
     "firebase-admin": "^9.4.1",
     "fluent-ffmpeg": "^2.1.2",
     "google-auth-library": "^6.1.3",

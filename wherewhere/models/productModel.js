@@ -34,16 +34,26 @@ productSchema.statics.register = function(payload){
     return product.save();
 };
 
-productSchema.statics.showAll = function(){
-    return this.find().populate("userIdx");
+productSchema.statics.showAllById = function(_id){
+    return this.find().sort({date: -1})
+                .where('userIdx').equals(_id)
+                .populate("userIdx");
 };
 
-productSchema.statics.showProductsBySubCategory = function(userIdx, subCategoryIdx){
-    return this.find()
+productSchema.statics.showProductsBySubCategory = function(_id, subCategoryIdx){
+    return this.find().sort({date: -1})
                 .where('subCategory').equals(subCategoryIdx)
                 .where('like').equals(false)
-                .where('userIdx').equals(userIdx)
+                .where('userIdx').equals(_id)
                 .populate('userIdx');
 };
+
+productSchema.statics.showByMainCategory = function(_id, mainCategoryIdx){
+    return this.find().sort({date: -1})
+                .where('mainCategory').equals(mainCategoryIdx)
+                .where('like').equals(false)
+                .where('userIdx').equals(_id)
+                .populate('userIdx');
+}
 
 module.exports = mongoose.model('userProduct', productSchema);

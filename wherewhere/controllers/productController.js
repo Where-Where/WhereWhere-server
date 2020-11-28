@@ -1,28 +1,27 @@
-const express = require('express');
 const productModel = require('../models/productModel');
+const statusCode = require('../modules/statusCode');
+const resMessage = require('../modules/resMessage');
+const sendMessage = require('../modules/sendMessage');
+const util = require('../modules/util');
 
 module.exports = {
     register: async(req, res)=>{
         try{
-            const result = await productModel.register(req.body);
+            const _id = req.decoded._id;
+            const {
+                siteUrl, dataUrl, resizedDataUrl, title, description, plural
+            } = req.body;
+            const result = await productModel.register({
+                siteUrl: siteUrl,
+                dataUrl: dataUrl,
+                resizedDataUrl: resizedDataUrl,
+                title: title,
+                description: description,
+                plural: plural,
+                userIdx: _id
+            });
             return res.send(result);
         }catch(err){
-            return res.status(500).send(err);
-        }
-    },
-    showProductsBySubCategory: async(req, res)=>{
-        const subCategoryIdx = req.params.subCategoryIdx;
-        const userIdx = req.body.userIdx;/**이거 맞나 */
-        console.log(subCategoryIdx, userIdx);
-        /**
-         * 카테고리별로 해당 사용자의 상품 다 보여주기
-         * 코드 수정해야 함.
-         */
-        try{
-            const result = await productModel.showProductsBySubCategory(userIdx, subCategoryIdx).exec();
-            return res.send(result);
-        }catch(err){
-            console.log(err);
             return res.status(500).send(err);
         }
     },
@@ -42,15 +41,37 @@ module.exports = {
          * const result = await productModel.registerImgs(userIdx, productIdx, imageLocations);
          */
     },
-    //테스트용
-    showAll: async(req, res)=>{
-        const userIdx = req.body.userIdx;
+    //홈 카테고리
+    showAllById: async(req, res)=>{
+        const _id = req.decoded._id;
         try{
-            const result = await productModel.showAll().exec();
+            const result = await productModel.showAllById(_id).exec();
             console.log('result : ', result);
-            return res.send(result);
+            return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.SHOW_BY_MAIN, result));
         }catch(err){
-            return res.status(500).send(err);
+            return res.status(statusCode.DB_ERROR).send(util.fail(statusCode.DB_ERROR, resMessage.DB_ERROR));
         }
     },
+    showByMainCategory: async(req, res)=>{
+        const _id = req.decoded._id;
+        const mainCategoryIdx = req.params.mainCategoryIdx;
+        try{
+            const result = await productModel.showByMainCategory(_id, mainCategoryIdx).exec();
+            console.log('result : ', result);
+            return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.SHOW_BY_MAIN, result));
+        }catch(err){
+            return res.status(statusCode.DB_ERROR).send(util.fail(statusCode.DB_ERROR, resMessage.DB_ERROR));
+        }
+    },
+    showBySubCategory: async(req, res)=>{
+        const _id = req.decoded._id;
+        const subCategoryIdx = req.params.subCategoryIdx;
+        try{
+            const result = await productModel.showProductsBySubCategory(_id, subCategoryIdx).exec();
+            console.log('result : ', result);
+            return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.SHOW_BY_SUB, result));
+        }catch(err){
+            return res.status(statusCode.DB_ERROR).send(util.fail(statusCode.DB_ERROR, resMessage.DB_ERROR));
+        }
+    }
 }
