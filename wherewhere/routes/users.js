@@ -2,10 +2,8 @@ var express = require('express');
 const userController = require('../controllers/userController');
 var router = express.Router();
 
-//더미데이터 집어넣기용 api
+//dummy user 집어넣기용
 router.post('/create', userController.createUser);
-
-
 
 router.post('/google', userController.googleSignIn);
 

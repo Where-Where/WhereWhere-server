@@ -8,6 +8,9 @@ var indexRouter = require('./routes/index');
 const bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 
+var fs = require('fs');
+const dburl = require('./config/mongod.json');
+
 var app = express();
 
 // view engine setup
@@ -48,6 +51,12 @@ db.once('open', function(){
   console.log("Connected to mongod server");
 });
 
-mongoose.connect('mongodb://localhost/testdb');
+mongoose.connect(dburl.url, {
+  useNewUrlParser: true,
+  ssl: true,
+  sslValidate: false,
+  sslCA: fs.readFileSync('./config/rds-combined-ca-bundle.pem')})
+  .then(()=>console.log("Connection to DB successful"))
+  .catch((err)=>console.error(err, 'Mongod Error'));
 
 module.exports = app;
