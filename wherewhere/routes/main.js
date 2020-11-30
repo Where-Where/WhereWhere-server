@@ -5,8 +5,8 @@ const authMiddleware = require('../middleware/auth');
 
 //const ffmpegController = require('../controllers/ffmpegController');
 //router.post('/video', ffmpegController.createFragmentPreview);
-//😈const upload = require('../modules/multer');
-//router.post('/imgs', upload.array('photo'), productController.registerImgs);
+const upload = require('../modules/multer');
+//router.post('/imgs', authMiddleware.checkToken, upload.array('photo'), productController.registerDummyImgs);
 
 /**더미데이터 */
 router.post('/register', authMiddleware.checkToken, productController.register);

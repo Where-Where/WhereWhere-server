@@ -25,22 +25,27 @@ module.exports = {
             return res.status(500).send(err);
         }
     },
-    registerImgs: async(req, res)=>{
-        const {userIdx, productIdx} = req.body;
-        /**
-         * multer를 쓰면서 다른 정보도 body로 받아올 수 있나?
-         */
-        let imageLocations = [];
+    /*
+    registerDummyImgs: async(req, res)=>{
+        const _id = req.decoded._id;
+        let imageLocations = {};
         for(var i=0; i<req.files.length; i++){
-            imageLocations[i]=req.files[i].location;
+            imageLocations["image"]=req.files[i].location;
         }
-        /**
-         * db에 넣으면 됨.
-         * model의 파라미터 중 img에 imageLocations를 넣고
-         * 나머지는 다 따로따로 넣어줘야할듯..?
-         * const result = await productModel.registerImgs(userIdx, productIdx, imageLocations);
-         */
-    },
+        const result = await productModel.register({
+            siteUrl: "siteUrl",
+            dataUrl: dataUrl,
+            resizedDataUrl: {
+                "category":"image",
+                "url":"resizedDataUrl"
+            },
+            title: title,
+            description: description,
+            plural: plural,
+            userIdx: _id
+        });
+    }
+    */
     //홈 카테고리
     showAllById: async(req, res)=>{
         const _id = req.decoded._id;

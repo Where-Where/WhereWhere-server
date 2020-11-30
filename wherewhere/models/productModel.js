@@ -56,4 +56,4 @@ productSchema.statics.showByMainCategory = function(_id, mainCategoryIdx){
                 .populate('userIdx');
 }
 
-module.exports = mongoose.model('userProduct', productSchema);
+module.exports = mongoose.model('Product', productSchema);

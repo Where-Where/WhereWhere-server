@@ -8,8 +8,7 @@ var indexRouter = require('./routes/index');
 const bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 
-var fs = require('fs');
-const dburl = require('./config/mongod.json');
+//var fs = require('fs');
 
 var app = express();
 
@@ -43,6 +42,8 @@ app.use(function(err, req, res, next) {
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+
+/*
 mongoose.Promise = global.Promise;
 
 var db = mongoose.connection;
@@ -51,12 +52,19 @@ db.once('open', function(){
   console.log("Connected to mongod server");
 });
 
+
+mongoose.connect('mongodb://localhost/testdb');
+
+*/
+const dburl = require('./config/mongod.json');
+
 mongoose.connect(dburl.url, {
   useNewUrlParser: true,
-  ssl: true,
-  sslValidate: false,
-  sslCA: fs.readFileSync('./config/rds-combined-ca-bundle.pem')})
-  .then(()=>console.log("Connection to DB successful"))
-  .catch((err)=>console.error(err, 'Mongod Error'));
+  useUnifiedTopology: true
+});
+
+mongoose.connection.on('connected', ()=>{
+  console.log('Mongoose is connected!');
+});
 
 module.exports = app;

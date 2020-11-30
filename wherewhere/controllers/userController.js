@@ -46,7 +46,7 @@ module.exports = {
             }
         }catch(err){
             console.log('google signIn error : ', err);
-            return res.status(statusCode.DB_ERROR).send(util.fail(status.DB_ERROR, resMessage.DB_ERROR));
+            return res.status(statusCode.BAD_REQUEST).send(util.fail(status.BAD_REQUEST, resMessage.DB_ERROR));
         }
     },
     facebookSignIn: async(req, res)=>{
@@ -80,7 +80,7 @@ module.exports = {
             }
         }catch(err){
             console.log('facebook signIn error : ', err);
-            return res.status(statusCode.DB_ERROR).send(util.fail(status.DB_ERROR, resMessage.DB_ERROR));
+            return res.status(statusCode.BAD_REQUEST).send(util.fail(status.BAD_REQUEST, resMessage.DB_ERROR));
         }
     },
     appleSignIn: async(req, res)=>{
@@ -114,7 +114,7 @@ module.exports = {
             }
         }catch(err){
             console.log('apple signIn error : ', err);
-            return res.status(statusCode.DB_ERROR).send(util.fail(status.DB_ERROR, resMessage.DB_ERROR));
+            return res.status(statusCode.BAD_REQUEST).send(util.fail(status.BAD_REQUEST, resMessage.DB_ERROR));
         }
     },
     /**더미데이터를 위한 임시 컨트롤러 */
@@ -126,7 +126,9 @@ module.exports = {
             console.log('create user result : ', result);
             const {token, _} = await jwt.sign(result);
             console.log("token : ", token);
-            return res.send({token: token});
+            return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.CREATED_USER, {
+                token : token
+            }));
         }catch(err){
             return res.status(500).send(err);
         }
