@@ -1,7 +1,6 @@
 const AWS = require('aws-sdk');
 const Sharp = require('sharp');
-AWS.config.loadFromPath(__dirname+ '/../config/s3.json');
-const S3 = new AWS.S3();
+const S3 = new AWS.S3({region: 'ap-northeast-2'});
 
 exports.handler = async (event, context, callback) => {
     const Bucket = event.Records[0].s3.bucket.name; 
