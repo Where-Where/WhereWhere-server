@@ -78,5 +78,28 @@ module.exports = {
         }catch(err){
             return res.status(statusCode.DB_ERROR).send(util.fail(statusCode.DB_ERROR, resMessage.DB_ERROR));
         }
+    },
+    uploadImg: async(req, res)=>{
+        const _id = req.decoded._id;
+        let imageLocations = [];
+        for(var i=0; i<req.files.length; i++){
+            imageLocations.push({
+                "category":"image",
+                "url":req.files[i].location
+            });
+        }
+        const result = await productModel.register({
+            siteUrl: "siteUrl",
+            dataUrl: imageLocations,
+            resizedDataUrl: [{
+                "category":"image",
+                "url":"resizedDataUrl"
+            }],
+            title: "title",
+            description: "description",
+            plural: true,
+            userIdx: _id
+        });
+        return res.send(result);
     }
 }

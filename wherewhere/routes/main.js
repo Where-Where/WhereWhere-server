@@ -10,7 +10,7 @@ const upload = require('../modules/multer');
 
 /**더미데이터 */
 router.post('/register', authMiddleware.checkToken, productController.register);
-
+router.post('/imgupload', authMiddleware.checkToken, upload.array('photo'), productController.uploadImg);
 
 /**
  * userIdx, product 글 정보, product 이미지 정보를 다 보내면
