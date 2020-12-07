@@ -15,7 +15,7 @@ const productSchema = new mongoose.Schema({
         url: {type: String, required: true}
     }],
     date: {type: String, default: date},/**가져온 일자 */
-    title: {type: String, required: true},
+    writer: {type: String, required: true},
     description: {type: String, required: true},
     plural: {type: Boolean, required: true},
     /**

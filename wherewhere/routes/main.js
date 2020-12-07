@@ -9,8 +9,8 @@ const upload = require('../modules/multer');
 //router.post('/imgs', authMiddleware.checkToken, upload.array('photo'), productController.registerDummyImgs);
 
 /**더미데이터 */
-router.post('/register', authMiddleware.checkToken, productController.register);
-router.post('/imgupload', authMiddleware.checkToken, upload.array('photo'), productController.uploadImg);
+//router.post('/register', authMiddleware.checkToken, productController.register);
+//router.post('/imgupload', authMiddleware.checkToken, upload.array('photo'), productController.uploadImg);
 
 /**
  * userIdx, product 글 정보, product 이미지 정보를 다 보내면
@@ -28,6 +28,9 @@ router.post('/imgupload', authMiddleware.checkToken, upload.array('photo'), prod
 /**해당 카테고리의 상품 보여주기
  * like 0인 상품만
  */
+router.post('/facebook', authMiddleware.checkToken, productController.facebookRegister);
+router.post('/instagram', authMiddleware.checkToken, productController.instagramCrawler);
+
 router.get('/show', authMiddleware.checkToken, productController.showAllById);
 router.get('/show/:mainCategorIdx', authMiddleware.checkToken, productController.showByMainCategory);
 router.get('/show/:subCategoryIdx', authMiddleware.checkToken, productController.showBySubCategory);

@@ -6,7 +6,6 @@ const admin = require('firebase-admin');
 const serviceAccount = require('../config/wherewhere-1b2ed-firebase-adminsdk-wvlc0-56b02093ac.json');
 const statusCode = require('../modules/statusCode');
 const resMessage = require('../modules/resMessage');
-const sendMessage = require('../modules/sendMessage');
 const util = require('../modules/util');
 
 admin.initializeApp({
