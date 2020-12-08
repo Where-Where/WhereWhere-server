@@ -10,49 +10,6 @@ const ffmpegController = require('./ffmpegController');
 const randomString = require('randomstring');
 const request = require('request');
 module.exports = {
-    /*
-    register: async(req, res)=>{
-        try{
-            const _id = req.decoded._id;
-            const {
-                siteUrl, dataUrl, resizedDataUrl, title, description, plural
-            } = req.body;
-            const result = await productModel.register({
-                siteUrl: siteUrl,
-                dataUrl: dataUrl,
-                resizedDataUrl: resizedDataUrl,
-                title: title,
-                description: description,
-                plural: plural,
-                userIdx: _id
-            });
-            return res.send(result);
-        }catch(err){
-            return res.status(500).send(err);
-        }
-    },
-    */
-    /*
-    registerDummyImgs: async(req, res)=>{
-        const _id = req.decoded._id;
-        let imageLocations = {};
-        for(var i=0; i<req.files.length; i++){
-            imageLocations["image"]=req.files[i].location;
-        }
-        const result = await productModel.register({
-            siteUrl: "siteUrl",
-            dataUrl: dataUrl,
-            resizedDataUrl: {
-                "category":"image",
-                "url":"resizedDataUrl"
-            },
-            title: title,
-            description: description,
-            plural: plural,
-            userIdx: _id
-        });
-    }
-    */
     //홈 카테고리
     showAllById: async(req, res)=>{
         const _id = req.decoded._id;
@@ -86,31 +43,6 @@ module.exports = {
             return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, resMessage.DB_ERROR));
         }
     },
-    /*
-    uploadImg: async(req, res)=>{
-        const _id = req.decoded._id;
-        let imageLocations = [];
-        for(var i=0; i<req.files.length; i++){
-            imageLocations.push({
-                "category":"image",
-                "url":req.files[i].location
-            });
-        }
-        const result = await productModel.register({
-            siteUrl: "siteUrl",
-            dataUrl: imageLocations,
-            resizedDataUrl: [{
-                "category":"image",
-                "url":"resizedDataUrl"
-            }],
-            title: "title",
-            description: "description",
-            plural: true,
-            userIdx: _id
-        });
-        return res.send(result);
-    },
-    */
     facebookRegister: async (req, res)=>{
         const _id = req.decoded._id;
         const { siteUrl, capturedImg } = req.body;
@@ -183,26 +115,81 @@ module.exports = {
     },
     instagramRegister: async(req, res)=>{
         const _id = req.decoded._id;
-        const { siteUrl, capturedImg } = req.body;
+        //const { siteUrl, capturedImg } = req.body;
+        const capturedImg = req.file.location;//리턴받은 url
+        const siteUrl = req.body.siteUrl;
         try{
             const result = await instagramCrawler.crawler(siteUrl);
-            if(result === "인스타그램 크롤링 에러"){
+            if(result === "인스타그램 크롤링 에러"){//크롤링 에러 -> 캡처한 사진 저장
                 console.log("인스타그램 크롤링 중 에러 발생, 캡처한 사진으로 저정한다.");
-                return;//임의
                 //캡처한 걸로 저장
-            }else if(result === "비공개 계정"){
-                console.log("비공개 계정, siteUrl만 저장한다.");
-                const result = await productModel.register({
-                    siteUrl: siteUrl,
-                    dataUrl: [],
-                    resizedDataUrl: [],
-                    writer: "비공개",
-                    description: "비공개",
-                    plural: false,
-                    userIdx: _id
+                request({
+                    method: 'POST',
+                    url: "https://zywu2rb1mb.execute-api.ap-northeast-2.amazonaws.com/v1/trigger",
+                    json: {
+                        "bucket": "wherewhere-bucket",
+                        "key": `images/${capturedImg.split('images/')[1]}`
+                    },
+                }, async function(error, response, body){
+                    if(error){
+                        throw error;
+                    }else{
+                        var filename = capturedImg.split('original/')[1];
+                        const resizedDatas = [{
+                            category: "image",
+                            url: `https://wherewhere-bucket.s3.ap-northeast-2.amazonaws.com/images/resized/${filename}`
+                        }];
+                        const originDatas = [{
+                            category: "image",
+                            url: `https://wherewhere-bucket.s3.ap-northeast-2.amazonaws.com/images/complete/${filename}`
+                        }];
+                        const result = await productModel.register({
+                            siteUrl: siteUrl,
+                            dataUrl: originDatas,
+                            resizedDataUrl: resizedDatas,
+                            writer: "비공개",
+                            description: "비공개",
+                            plural: false,
+                            userIdx: _id
+                        });
+                        return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.REGISTER_SUCCESS_INSTA, result));
+                    }
                 });
-                return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.REGISTER_SUCCESS_INSTA, result));
-            }else{
+            }else if(result === "비공개 계정"){//비공개 계정 -> 캡처한 사진 저장
+                console.log("비공개 계정, siteUrl만 저장한다.");
+                request({
+                    method: 'POST',
+                    url: "https://zywu2rb1mb.execute-api.ap-northeast-2.amazonaws.com/v1/trigger",
+                    json: {
+                        "bucket": "wherewhere-bucket",
+                        "key": `images/${capturedImg.split('images/')[1]}`
+                    },
+                }, async function(error, response, body){
+                    if(error){
+                        throw error;
+                    }else{
+                        var filename = capturedImg.split('original/')[1];
+                        const resizedDatas = [{
+                            category: "image",
+                            url: `https://wherewhere-bucket.s3.ap-northeast-2.amazonaws.com/images/resized/${filename}`
+                        }];
+                        const originDatas = [{
+                            category: "image",
+                            url: `https://wherewhere-bucket.s3.ap-northeast-2.amazonaws.com/images/complete/${filename}`
+                        }];
+                        const result = await productModel.register({
+                            siteUrl: siteUrl,
+                            dataUrl: originDatas,
+                            resizedDataUrl: resizedDatas,
+                            writer: "비공개",
+                            description: "비공개",
+                            plural: false,
+                            userIdx: _id
+                        });
+                        return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.REGISTER_SUCCESS_INSTA, result));
+                    }
+                });
+            }else{//크롤링한 자료로 저장
                 const {
                     writer,
                     content,
@@ -219,7 +206,7 @@ module.exports = {
                     if(cnt>=2){
                         pluralTF = true;
                     }
-                    if(element["category"]=="image"){
+                    if(element["category"]=="image"){//사진 저장
                         const returnImg = await downloadModule.download(element["url"], newFileName, cnt);
                         await request({
                             method: 'POST',

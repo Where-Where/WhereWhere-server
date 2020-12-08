@@ -8,10 +8,12 @@ const s3 = new aws.S3();
 const upload = multer({
     storage: multerS3({
         s3: s3,
-        bucket: 'wherewhere',
+        bucket: 'wherewhere-bucket',
         acl: 'public-read',
         key: function(req, file, cb){
-            cb(null, Date.now()+'.'+file.originalname.split('.').pop());
+            console.log('key file : ', file);
+            const filename = Date.now()+'.'+file.originalname.split('.').pop();
+            cb(null, `images/original/${filename}`);
         }
     })
 });

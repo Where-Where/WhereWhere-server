@@ -3,8 +3,6 @@ var router = express.Router();
 const productController = require('../controllers/productController');
 const authMiddleware = require('../middleware/auth');
 
-//const ffmpegController = require('../controllers/ffmpegController');
-//router.post('/video', ffmpegController.createFragmentPreview);
 const upload = require('../modules/multer');
 //router.post('/imgs', authMiddleware.checkToken, upload.array('photo'), productController.registerDummyImgs);
 
@@ -12,13 +10,6 @@ const upload = require('../modules/multer');
 //router.post('/register', authMiddleware.checkToken, productController.register);
 //router.post('/imgupload', authMiddleware.checkToken, upload.array('photo'), productController.uploadImg);
 
-/**
- * userIdx, product 글 정보, product 이미지 정보를 다 보내면
- * 첫 번째 미들웨어 : product 이미지 정보만 분리해서 multer
- * 두 번째 미들웨어 : multer -> s3에 저장
- * 컨트롤러 : s3에 저장한 이미지 url과 userIdx, product 글 정보 합치기
- */
-//😈router.post('/register', upload.array('photo'), productController.register);
 
 /**상품 삭제
  * 진짜 삭제가 아니라 like를 0에서 1로 바꾸기
@@ -28,8 +19,9 @@ const upload = require('../modules/multer');
 /**해당 카테고리의 상품 보여주기
  * like 0인 상품만
  */
-router.post('/facebook', authMiddleware.checkToken, productController.facebookRegister);
-router.post('/instagram', authMiddleware.checkToken, productController.instagramRegister);
+router.post('/facebook', authMiddleware.checkToken, upload.single('photo'), productController.facebookRegister);
+router.post('/instagram', authMiddleware.checkToken, upload.single('photo'), productController.instagramRegister);
+//router.post('/image', authMiddleware.checkToken, upload.single('photo'), productController.registerImage);
 
 router.get('/show', authMiddleware.checkToken, productController.showAllById);
 router.get('/show/:mainCategorIdx', authMiddleware.checkToken, productController.showByMainCategory);
