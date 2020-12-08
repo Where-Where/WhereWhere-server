@@ -29,7 +29,7 @@ const upload = require('../modules/multer');
  * like 0인 상품만
  */
 router.post('/facebook', authMiddleware.checkToken, productController.facebookRegister);
-router.post('/instagram', authMiddleware.checkToken, productController.instagramCrawler);
+router.post('/instagram', authMiddleware.checkToken, productController.instagramRegister);
 
 router.get('/show', authMiddleware.checkToken, productController.showAllById);
 router.get('/show/:mainCategorIdx', authMiddleware.checkToken, productController.showByMainCategory);

@@ -141,9 +141,9 @@ module.exports = {
                     });
                     await request({
                         method: 'POST',
-                        url: "https://12wfwwzv59.execute-api.ap-northeast-2.amazonaws.com/v1/trigger",
+                        url: "https://zywu2rb1mb.execute-api.ap-northeast-2.amazonaws.com/v1/trigger",
                         json: {
-                            "bucket": "wherewhere",
+                            "bucket": "wherewhere-bucket",
                             "key": returnImg['fileName']
                         },
                     }, function(error, response, body){
@@ -153,11 +153,11 @@ module.exports = {
                             var filename = returnImg['fileName'].split('original/')[1];
                             resizedImages.push({
                                 category: "image",
-                                url: `https://wherewhere.s3.ap-northeast-2.amazonaws.com/images/resized/${filename}`
+                                url: `https://wherewhere-bucket.s3.ap-northeast-2.amazonaws.com/images/resized/${filename}`
                             });
                             originImages.push({
                                 category: "image",
-                                url: `https://wherewhere.s3.ap-northeast-2.amazonaws.com/images/complete/${filename}`
+                                url: `https://wherewhere-bucket.s3.ap-northeast-2.amazonaws.com/images/complete/${filename}`
                             });
                         }
                     });
@@ -174,14 +174,14 @@ module.exports = {
                         userIdx: _id
                     });
                     return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.REGISTER_SUCCESS_FB, result));
-                }, 5000);
+                }, 6000);
             }
         }catch(err){
             console.log('facebookCrawler error : ', err);
             return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, resMessage.DB_ERROR));
         }
     },
-    instagramCrawler: async(req, res)=>{
+    instagramRegister: async(req, res)=>{
         const _id = req.decoded._id;
         const { siteUrl, capturedImg } = req.body;
         try{
@@ -191,9 +191,17 @@ module.exports = {
                 return;//임의
                 //캡처한 걸로 저장
             }else if(result === "비공개 계정"){
-                console.log("비공개 계정, 글만 저장한다.");
-                return;//임의
-                //글만 저장
+                console.log("비공개 계정, siteUrl만 저장한다.");
+                const result = await productModel.register({
+                    siteUrl: siteUrl,
+                    dataUrl: [],
+                    resizedDataUrl: [],
+                    writer: "비공개",
+                    description: "비공개",
+                    plural: false,
+                    userIdx: _id
+                });
+                return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.REGISTER_SUCCESS_INSTA, result));
             }else{
                 const {
                     writer,
@@ -204,16 +212,20 @@ module.exports = {
                 const resizedDatas = [];
                 const newFileName = randomString.generate(17);
                 var cnt = 0;
+                var pluralTF = false;
                 //console.log(writer, content, datas);
                 datas.forEach(async (element)=>{
                     cnt+=1;
+                    if(cnt>=2){
+                        pluralTF = true;
+                    }
                     if(element["category"]=="image"){
                         const returnImg = await downloadModule.download(element["url"], newFileName, cnt);
                         await request({
                             method: 'POST',
-                            url: "https://12wfwwzv59.execute-api.ap-northeast-2.amazonaws.com/v1/trigger",
+                            url: "https://zywu2rb1mb.execute-api.ap-northeast-2.amazonaws.com/v1/trigger",
                             json: {
-                                "bucket": "wherewhere",
+                                "bucket": "wherewhere-bucket",
                                 "key": returnImg['fileName']
                             },
                         }, function(error, response, body){
@@ -223,24 +235,51 @@ module.exports = {
                                 var filename = returnImg['fileName'].split('original/')[1];
                                 resizedDatas.push({
                                     category: "image",
-                                    url: `https://wherewhere.s3.ap-northeast-2.amazonaws.com/images/resized/${newFileName}`
+                                    url: `https://wherewhere-bucket.s3.ap-northeast-2.amazonaws.com/images/resized/${filename}`
                                 });
                                 originDatas.push({
                                     category: "image",
-                                    url: `https://wherewhere.s3.ap-northeast-2.amazonaws.com/images/complete/${newFileName}`
+                                    url: `https://wherewhere-bucket.s3.ap-northeast-2.amazonaws.com/images/complete/${filename}`
                                 });
                             }
                         });
                     }else{//비디오 저장
-                        const returnVid = await downloadModuleVid.download(element["url"], newFileName, cnt);
-                        console.log('returnVid : ', returnVid);
-                        const inputPath = returnVid["location"];
-                        const outputPath = `https://wherewhere.s3.ap-northeast-2.amazonaws.com/videos/thumb/${newFileName}.mp4`;
-                        const ffmpegResult = await ffmpegController.createFragmentPreview(inputPath, outputPath);
-                        console.log('ffmpegResult : ', ffmpegResult);
-
+                        try{
+                            const returnVid = await downloadModuleVid.download(element["url"], newFileName, cnt);
+                            //console.log('returnVid : ', returnVid);
+                            const inputPath = returnVid["location"];//original vid url
+                            const ffmpegResult = await ffmpegController.createPreviewVideo(inputPath);
+                            //console.log('ffmpegResult : ', ffmpegResult);
+                            const thumbVidUrl = ffmpegResult["Location"];
+                            originDatas.push({
+                                category: "video",
+                                url: `${inputPath}`
+                            });
+                            resizedDatas.push({
+                                category: "video",
+                                url: `${thumbVidUrl}`
+                            });
+                        }catch(err){
+                            console.log('ffmpeg vid error : ', err);
+                            throw err;
+                        }
+                        
                     }
-                })
+                    //console.log('originDatas : ', originDatas);
+                    //console.log('resizedData : ', resizedDatas);
+                });
+                setTimeout(async function(){
+                    const result = await productModel.register({
+                        siteUrl: siteUrl,
+                        dataUrl: originDatas,
+                        resizedDataUrl: resizedDatas,
+                        writer: writer,
+                        description: content,
+                        plural: pluralTF,
+                        userIdx: _id
+                    });
+                    return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.REGISTER_SUCCESS_INSTA, result));
+                }, 6000);
             }
         }catch(err){
             console.log('instagramCrawler error : ', err);

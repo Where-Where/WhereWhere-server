@@ -20,7 +20,7 @@ module.exports = {
         var params = {
             Key: `images/original/${imageName}${cnt}.${paramsType}`,
             Body: buffer,
-            Bucket: "wherewhere",
+            Bucket: "wherewhere-bucket",
             ContentType: type,
             ACL: 'public-read'
         };
