@@ -54,6 +54,21 @@ productSchema.statics.showByMainCategory = function(_id, mainCategoryIdx){
                 .where('like').equals(false)
                 .where('userIdx').equals(_id)
                 .populate('userIdx');
+};
+
+productSchema.statics.showOneProductDetail = function(_id, productIdx){
+    return this.find()
+                .where('_id').equals(mongoose.Types.ObjectId(productIdx))
+                .where('userIdx').equals(_id)
+                .populate('userIdx');
+};
+
+productSchema.statics.deleteOneProduct = function(_id, payload){
+    return this.findOneAndUpdate({_id}, payload, {new: true});
+};
+
+productSchema.statics.heartClicked = function(_id, payload){
+    return this.findOneAndUpdate({_id}, payload, {new: true});
 }
 
 module.exports = mongoose.model('Product', productSchema);

@@ -26,4 +26,10 @@ router.get('/show', authMiddleware.checkToken, productController.showAllById);
 router.get('/show/:mainCategoryIdx', authMiddleware.checkToken, productController.showByMainCategory);
 router.get('/show/:subCategoryIdx', authMiddleware.checkToken, productController.showBySubCategory);
 
+router.get('/detail', authMiddleware.checkToken, productController.showDetail);
+router.put('/delete', authMiddleware.checkToken, productController.deleteProduct);
+router.put('/heart', authMiddleware.checkToken, productController.heartClick);
+//router.get('/filter', authMiddleware.checkToken, productController.heartFilter);
+
+
 module.exports = router;

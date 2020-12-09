@@ -60,7 +60,8 @@ const dburl = require('./config/mongod.json');
 
 mongoose.connect(dburl.url, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  useFindAndModify: false
 });
 
 mongoose.connection.on('connected', ()=>{

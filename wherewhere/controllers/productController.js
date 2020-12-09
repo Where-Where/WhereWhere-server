@@ -9,39 +9,107 @@ const downloadModuleVid = require('../modules/VIDdownloadToS3');
 const ffmpegController = require('./ffmpegController');
 const randomString = require('randomstring');
 const request = require('request');
+
 module.exports = {
     //홈 카테고리
     showAllById: async(req, res)=>{
         const _id = req.decoded._id;
         try{
             const result = await productModel.showAllById(_id).exec();
-            console.log('result : ', result);
+            //console.log('result : ', result);
             return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.SHOW_ALL_BY_ID, result));
         }catch(err){
             return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, resMessage.SERVER_ERROR));
         }
     },
+    //메인 카테고리
     showByMainCategory: async(req, res)=>{
         const _id = req.decoded._id;
         const mainCategoryIdx = req.params.mainCategoryIdx;
         try{
             const result = await productModel.showByMainCategory(_id, mainCategoryIdx).exec();
-            console.log('result : ', result);
+            //console.log('result : ', result);
             return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.SHOW_BY_MAIN, result));
         }catch(err){
             return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, resMessage.SERVER_ERROR));
         }
     },
+    //서브 카테고리
     showBySubCategory: async(req, res)=>{
         const _id = req.decoded._id;
         const subCategoryIdx = req.params.subCategoryIdx;
         try{
             const result = await productModel.showProductsBySubCategory(_id, subCategoryIdx).exec();
-            console.log('result : ', result);
+            //console.log('result : ', result);
             return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.SHOW_BY_SUB, result));
         }catch(err){
             return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, resMessage.SERVER_ERROR));
         }
+    },
+    showDetail: async(req, res)=>{
+        const _id = req.decoded._id;
+        const productIdx = req.body.productIdx;
+        try{
+            const result = await productModel.showOneProductDetail(_id, productIdx).exec();
+            //userActionSchema 만들어야 할 듯
+            return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.SHOW_ONE_DETAIL, result));
+        }catch(err){
+            console.log('err : ', err);
+            return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, resMessage.SERVER_ERROR));
+        }
+    },
+    deleteProduct: async(req, res)=>{
+        const _id = req.decoded._id;
+        const productIdx = req.body.productIdx;
+        try{
+            const detail = await productModel.showOneProductDetail(_id, productIdx);
+            if(detail[0]["like"]===false){
+                const payload = {
+                    like: true
+                };
+                const result = await productModel.deleteOneProduct(productIdx, payload);
+                return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.DELETE_PRODUCT, result));
+            }else{
+                const payload = {
+                    like: false
+                };
+                const result = await productModel.deleteOneProduct(productIdx, payload);
+                return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.DELETE_PRODUCT, result));
+            }
+            //return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.DELETE_PRODUCT, result));
+        }catch(err){
+            console.log('err : ', err);
+            return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, resMessage.SERVER_ERROR));
+        }
+    },
+    heartClick: async(req, res)=>{
+        const _id = req.decoded._id;
+        const productIdx = req.body.productIdx;
+        try{
+            const detail = await productModel.showOneProductDetail(_id, productIdx);
+            if(detail[0]["importance"]==0){
+                const payload = {
+                    importance: 1
+                };
+                const result = await productModel.heartClicked(productIdx, payload);
+                return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.HEART_CLICK_ON, result));
+            }else{
+                const payload = {
+                    importance: 0
+                };
+                const result = await productModel.heartClicked(productIdx, payload);
+                return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.HEART_CLICK_OFF, result));
+            }
+        }catch(err){
+            console.log('err : ', err);
+            return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, resMessage.SERVER_ERROR));
+        }
+    },
+    heartFilter: async(req, res)=>{
+        const _id = req.decoded._id;
+        /**
+         * 클라에서 sorting해주는 게 더 낫지 않을까?
+         */
     },
     facebookRegister: async (req, res)=>{
         const _id = req.decoded._id;
