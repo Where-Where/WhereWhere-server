@@ -6,7 +6,7 @@ module.exports = {
         try{
             const username = myInfo.username;
             const password = myInfo.password;
-            const browser = await puppeteer.launch({headless: false});
+            const browser = await puppeteer.launch({headless: true});
             const page = await browser.newPage();
             await page.goto("https://www.instagram.com/");
             await page.waitForTimeout(2000);

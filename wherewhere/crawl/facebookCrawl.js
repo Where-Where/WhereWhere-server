@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 module.exports = {
     crawl: async(requestUrl)=>{
         try{
-            const browser = await puppeteer.launch({headless: false});
+            const browser = await puppeteer.launch({headless: true});
             const page = await browser.newPage();
             /*
             // 로그인 할 필요가 없다.. 왜나면 안되기 때문이지
