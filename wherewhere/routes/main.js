@@ -21,10 +21,9 @@ const upload = require('../modules/multer');
  */
 router.post('/facebook', authMiddleware.checkToken, upload.single('photo'), productController.facebookRegister);
 router.post('/instagram', authMiddleware.checkToken, upload.single('photo'), productController.instagramRegister);
-//router.post('/image', authMiddleware.checkToken, upload.single('photo'), productController.registerImage);
 
 router.get('/show', authMiddleware.checkToken, productController.showAllById);
-router.get('/show/:mainCategorIdx', authMiddleware.checkToken, productController.showByMainCategory);
+router.get('/show/:mainCategoryIdx', authMiddleware.checkToken, productController.showByMainCategory);
 router.get('/show/:subCategoryIdx', authMiddleware.checkToken, productController.showBySubCategory);
 
 module.exports = router;

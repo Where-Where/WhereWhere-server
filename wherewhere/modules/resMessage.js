@@ -55,6 +55,7 @@ module.exports = {
     SHOW_BY_SUB: 'SUB 카테고리 중 하나 클릭',
     REGISTER_SUCCESS_FB: 'FB 게시물 저장 성공',
     REGISTER_SUCCESS_INSTA: 'Instagram 게시물 저장 성공',
+    SERVER_ERROR: 'SERVER_ERROR',
     DB_ERROR: 'DB 오류'
 
 };

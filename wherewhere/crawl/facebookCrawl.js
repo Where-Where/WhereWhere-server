@@ -49,7 +49,8 @@ module.exports = {
             console.log("비공개 게시글 혹은 크롤링 중 문제 발생");
             await page.close();
             await browser.close();
-            return "비공개 게시글";
+            //return "비공개 게시글";
+            throw err;
         }
     }
 };

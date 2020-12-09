@@ -15,7 +15,7 @@ module.exports = {
             await page.type('input[name="password"]', password, {delay: 50});
             let loginButton = await page.$x('//div[contains(text(), "로그인")]');
             await loginButton[0].click();
-            await page.waitForTimeout(5000);
+            await page.waitForTimeout(3000);
             await page.goto(requestUrl);
             // 크롤링
             await page.waitForSelector("article:first-of-type");
@@ -86,8 +86,9 @@ module.exports = {
             await browser.close();
             return result;
         }catch(err){
-            console.log('err : ', err);
-            return "인스타그램 크롤링 에러";
+            console.log('insta crawl err : ', err);
+            throw err;
+            //return "인스타그램 크롤링 에러";
         }
     }
 };

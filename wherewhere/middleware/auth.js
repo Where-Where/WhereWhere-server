@@ -9,11 +9,11 @@ const authUtil = {
     checkToken: async (req, res, next) => {
         if (req.headers.token === undefined) {
             console.log("토큰이 없습니다.");
-            return res.json(util.fail(CODE.OK, MSG.EMPTY_TOKEN));
+            return res.json(util.fail(CODE.UNAUTHORIZED, MSG.EMPTY_TOKEN));
         } else {
             var token = req.headers.token;
             if (!token) {
-                return res.json(util.fail(CODE.OK, MSG.EMPTY_TOKEN));
+                return res.json(util.fail(CODE.UNAUTHORIZED, MSG.EMPTY_TOKEN));
             }
             const user = await jwt.verify(token);
             if (user === TOKEN_EXPIRED) {

@@ -11,7 +11,7 @@ const upload = multer({
         bucket: 'wherewhere-bucket',
         acl: 'public-read',
         key: function(req, file, cb){
-            console.log('key file : ', file);
+            //console.log('key file : ', file);
             const filename = Date.now()+'.'+file.originalname.split('.').pop();
             cb(null, `images/original/${filename}`);
         }
