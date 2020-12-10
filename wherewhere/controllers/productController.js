@@ -365,7 +365,7 @@ module.exports = {
                 }, 4000);
             }
         }catch(err){
-            console.log("인스타그램 크롤링 혹은 사진 저장 중 에러 발생, 캡처한 사진으로 저장한다.", err);
+            console.log("인스타그램 크롤링 혹은 사진 저장 중 에러 발생, 캡처한 사진으로 저장한다.");
             try{
                 request({
                     method: 'POST',

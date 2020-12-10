@@ -29,8 +29,8 @@ module.exports = {
                     return "비공개 계정"
                 }else{
                     //작성자
-                    const writer = document.querySelector("a.sqdOP").textContent;
-    
+                    //const writer = document.querySelector("a.sqdOP").textContent;
+                    const writer = document.querySelector("a.sqdOP")&&document.querySelector("a.sqdOP").textContent;
                     //사진, 동영상
                     var datas = [];
                     if(document.querySelector(".Ckrof")){
