@@ -13,7 +13,7 @@ module.exports = {
             //로그인
             await page.type('input[name="username"]', username, {delay: 50});
             await page.type('input[name="password"]', password, {delay: 50});
-            let loginButton = await page.$x('//div[contains(text(), "로그인")]');
+            let loginButton = await page.$x('//div[contains(text(), "Log In")]');
             await loginButton[0].click();
             await page.waitForTimeout(3000);
             await page.goto(requestUrl);
