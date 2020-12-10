@@ -17,6 +17,8 @@ module.exports = {
             let loginButton = await page.$x('//div[contains(text(), "Log In")]');
             //let loginButton = await page.$x('//div[contains(text(), "로그인")]');
             await loginButton[0].click();
+            //추가
+            await page.setDefaultNavigationTimeout(0);
             await page.waitForTimeout(3000);
             await page.goto(requestUrl);
             // 크롤링
