@@ -1,7 +1,7 @@
 const userModel = require('../models/userModel');
 const jwt = require('../modules/jwt');
 const admin = require('firebase-admin');
-const serviceAccount = require('../config/wherewhere-1b2ed-firebase-adminsdk-wvlc0-56b02093ac.json');
+const serviceAccount = require('../config/wherewhere-1b2ed-firebase-adminsdk-wvlc0-ac3f0c5832.json');
 const statusCode = require('../modules/statusCode');
 const resMessage = require('../modules/resMessage');
 const util = require('../modules/util');
@@ -23,7 +23,7 @@ module.exports = {
             const userByUid = await userModel.findByUid(uid).exec();
             console.log('userByUid : ', userByUid);
             if(userByUid === null){
-                /**없는 사용자 -> 회원가입 시키기 */
+                //없는 사용자 -> 회원가입 시키기
                 const newUser = await userModel.createUser({
                     "sns_category":"google",
                     "uid": uid
@@ -34,7 +34,7 @@ module.exports = {
                     token : token
                 }));
             }else{
-                /**있는 사용자 -> 그냥 로그인 */
+                //있는 사용자 -> 그냥 로그인
                 console.log("구글 - 기존에 있던 사용자");
                 const {token, _} = await jwt.sign(userByUid);
                 return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.LOGIN_SUCCESS, {
