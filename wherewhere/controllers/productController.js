@@ -291,8 +291,11 @@ module.exports = {
                     content,
                     datas
                 } = result;
+                console.log('writer, content, datas : ', writer, content, datas);
                 const originDatas = [];
                 const resizedDatas = [];
+                const originDict = {};
+                const resizedDict = {};
                 const newFileName = randomString.generate(17);
                 var cnt = 0;
                 var pluralTF = false;
@@ -304,6 +307,7 @@ module.exports = {
                     }
                     if(element["category"]=="image"){//사진 저장
                         const returnImg = await downloadModule.download(element["url"], newFileName, cnt);
+                        console.log('returnImg : ', returnImg);
                         request({
                             method: 'POST',
                             url: "https://zywu2rb1mb.execute-api.ap-northeast-2.amazonaws.com/v1/trigger",

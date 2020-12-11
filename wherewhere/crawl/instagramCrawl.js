@@ -6,7 +6,7 @@ module.exports = {
         try{
             const username = myInfo.username;
             const password = myInfo.password;
-            const browser = await puppeteer.launch({headless: true});
+            const browser = await puppeteer.launch({headless: false});
             //const browser = await puppeteer.launch({headless: false});
             const page = await browser.newPage();
             await page.goto("https://www.instagram.com/");
@@ -14,15 +14,15 @@ module.exports = {
             //로그인
             await page.type('input[name="username"]', username, {delay: 50});
             await page.type('input[name="password"]', password, {delay: 50});
-            let loginButton = await page.$x('//div[contains(text(), "Log In")]');
-            //let loginButton = await page.$x('//div[contains(text(), "로그인")]');
+            //let loginButton = await page.$x('//div[contains(text(), "Log In")]');
+            let loginButton = await page.$x('//div[contains(text(), "로그인")]');
             await loginButton[0].click();
             //추가
             await page.setDefaultNavigationTimeout(0);
             await page.waitForTimeout(3000);
             await page.goto(requestUrl);
             // 크롤링
-            //await page.waitForSelector("article:first-of-type");
+            await page.waitForSelector("article:first-of-type");
     
     
             const result = await page.evaluate(()=>{
@@ -31,8 +31,8 @@ module.exports = {
                     return "비공개 계정"
                 }else{
                     //작성자
-                    //const writer = document.querySelector("a.sqdOP").textContent;
-                    const writer = document.querySelector("a.sqdOP")&&document.querySelector("a.sqdOP").textContent;
+                    const writer = document.querySelector("a.sqdOP").textContent;
+                    //const writer = document.querySelector("a.sqdOP")&&document.querySelector("a.sqdOP").textContent;
                     //사진, 동영상
                     var datas = [];
                     if(document.querySelector(".Ckrof")){
@@ -42,13 +42,13 @@ module.exports = {
                             if(element.querySelector("._5wCQW")){
                                 datas.push({
                                     category: "video",
-                                    url: document.querySelector("._5wCQW video").src
+                                    url: element.querySelector("._5wCQW video").src
                                 });
                             }
                             if(element.querySelector(".KL4Bh")){
                                 datas.push({
                                     category: "image",
-                                    url: document.querySelector(".KL4Bh img").src
+                                    url: element.querySelector(".KL4Bh img").src
                                 });
                             }
                         })
@@ -86,8 +86,8 @@ module.exports = {
                     };
                 }
             });
-            await page.close();
-            await browser.close();
+            //await page.close();
+            //await browser.close();
             return result;
         }catch(err){
             console.log('insta crawl err : ', err);
