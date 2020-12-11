@@ -43,7 +43,7 @@ module.exports = {
             }
         }catch(err){
             console.log('google signIn error : ', err);
-            return res.status(statusCode.BAD_REQUEST).send(util.fail(status.BAD_REQUEST, resMessage.SERVER_ERROR));
+            return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, resMessage.SERVER_ERROR));
         }
     },
     facebookSignIn: async(req, res)=>{
