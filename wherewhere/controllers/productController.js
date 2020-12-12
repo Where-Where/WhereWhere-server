@@ -291,15 +291,13 @@ module.exports = {
                     content,
                     datas
                 } = result;
-                console.log('writer, content, datas : ', writer, content, datas);
-                const originDatas = [];
-                const resizedDatas = [];
-                const originDict = {};
-                const resizedDict = {};
+                //console.log('writer, content, datas : ', writer, content, datas);
+                const originDatas = {};
+                const resizedDatas = {};
                 const newFileName = randomString.generate(17);
                 var cnt = 0;
                 var pluralTF = false;
-                //console.log(writer, content, datas);
+                console.log(writer, content, datas);
                 datas.forEach(async (element)=>{
                     cnt+=1;
                     if(cnt>=2){
@@ -307,7 +305,7 @@ module.exports = {
                     }
                     if(element["category"]=="image"){//사진 저장
                         const returnImg = await downloadModule.download(element["url"], newFileName, cnt);
-                        console.log('returnImg : ', returnImg);
+                        //console.log('returnImg : ', returnImg);
                         request({
                             method: 'POST',
                             url: "https://zywu2rb1mb.execute-api.ap-northeast-2.amazonaws.com/v1/trigger",
@@ -320,14 +318,14 @@ module.exports = {
                                 throw error;
                             }else{
                                 var filename = returnImg['fileName'].split('original/')[1];
-                                resizedDatas.push({
+                                resizedDatas[filename] = {
                                     category: "image",
                                     url: `https://wherewhere-bucket.s3.ap-northeast-2.amazonaws.com/images/resized/${filename}`
-                                });
-                                originDatas.push({
+                                };
+                                originDatas[filename] = {
                                     category: "image",
                                     url: `https://wherewhere-bucket.s3.ap-northeast-2.amazonaws.com/images/complete/${filename}`
-                                });
+                                };
                             }
                         });
                     }else{//비디오 저장
@@ -335,9 +333,19 @@ module.exports = {
                             const returnVid = await downloadModuleVid.download(element["url"], newFileName, cnt);
                             //console.log('returnVid : ', returnVid);
                             const inputPath = returnVid["location"];//original vid url
+                            const filename = inputPath.split('original/')[1];
                             const ffmpegResult = await ffmpegController.createPreviewVideo(inputPath);
                             //console.log('ffmpegResult : ', ffmpegResult);
                             const thumbVidUrl = ffmpegResult["Location"];
+                            resizedDatas[filename] = {
+                                category: "video",
+                                url: `${thumbVidUrl}`
+                            };
+                            originDatas[filename] = {
+                                category: "video",
+                                url: `${inputPath}`
+                            };
+                            /*
                             originDatas.push({
                                 category: "video",
                                 url: `${inputPath}`
@@ -346,6 +354,7 @@ module.exports = {
                                 category: "video",
                                 url: `${thumbVidUrl}`
                             });
+                            */
                         }catch(err){
                             console.log('ffmpeg vid error : ', err);
                             throw err;
@@ -356,16 +365,59 @@ module.exports = {
                     //console.log('resizedData : ', resizedDatas);
                 });
                 setTimeout(async function(){
+                    const originDataOrdered = [];
+                    const resizedDataOrdered = [];
+                    const func = function(originDatas, resizedDatas, callback){
+                        //const originDataOrdered = [];
+                        const originKeys = Object.keys(originDatas).sort();
+                        originKeys.forEach((key)=>{
+                            originDataOrdered.push(originDatas[key])
+                        });
+                        //const resizedDataOrdered = [];
+                        const resizedKeys = Object.keys(resizedDatas).sort();
+                        resizedKeys.forEach((key)=>{
+                        resizedDataOrdered.push(resizedDatas[key])
+                        });
+                        callback()
+                    }
+                    func(originDatas, resizedDatas, async function(){
+                        console.log('originDataOrderd : ', originDataOrdered);
+                        console.log('resizedDataOrdered : ', resizedDataOrdered);
+                        const result = await productModel.register({
+                            siteUrl: siteUrl,
+                            dataUrl: originDataOrdered,
+                            resizedDataUrl: resizedDataOrdered,
+                            writer: writer,
+                            description: content,
+                            plural: pluralTF,
+                            userIdx: _id
+                        });
+                        return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.REGISTER_SUCCESS_INSTA, result));
+                    })
+                    /*
+                    const originDataOrdered = [];
+                    const originKeys = Object.keys(originDatas).sort();
+                    originKeys.forEach((key)=>{
+                        originDataOrdered.push(originDatas[key])
+                    });
+                    const resizedDataOrdered = [];
+                    const resizedKeys = Object.keys(resizedDatas).sort();
+                    resizedKeys.forEach((key)=>{
+                        resizedDataOrdered.push(resizedDatas[key])
+                    });
+                    
                     const result = await productModel.register({
                         siteUrl: siteUrl,
-                        dataUrl: originDatas,
-                        resizedDataUrl: resizedDatas,
+                        dataUrl: originDataOrdered,
+                        resizedDataUrl: resizedDataOrdered,
                         writer: writer,
                         description: content,
                         plural: pluralTF,
                         userIdx: _id
                     });
                     return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.REGISTER_SUCCESS_INSTA, result));
+                    */
+                    
                 }, 4000);
             }
         }catch(err){

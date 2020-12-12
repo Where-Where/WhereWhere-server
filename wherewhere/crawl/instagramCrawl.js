@@ -6,16 +6,15 @@ module.exports = {
         try{
             const username = myInfo.username;
             const password = myInfo.password;
-            const browser = await puppeteer.launch({headless: false});
-            //const browser = await puppeteer.launch({headless: false});
+            const browser = await puppeteer.launch({headless: true});
             const page = await browser.newPage();
             await page.goto("https://www.instagram.com/");
             await page.waitForTimeout(2000);
             //로그인
             await page.type('input[name="username"]', username, {delay: 50});
             await page.type('input[name="password"]', password, {delay: 50});
-            //let loginButton = await page.$x('//div[contains(text(), "Log In")]');
-            let loginButton = await page.$x('//div[contains(text(), "로그인")]');
+            let loginButton = await page.$x('//div[contains(text(), "Log In")]');
+            //let loginButton = await page.$x('//div[contains(text(), "로그인")]');
             await loginButton[0].click();
             //추가
             await page.setDefaultNavigationTimeout(0);
@@ -60,7 +59,7 @@ module.exports = {
                                 url: document.querySelector("._5wCQW video").src
                             });
                         }
-                        if(document.querySelector(".KL4Bh")){
+                        else if(document.querySelector(".KL4Bh")){
                             datas.push({
                                 category: "image",
                                 url: document.querySelector(".KL4Bh img").src
@@ -86,8 +85,8 @@ module.exports = {
                     };
                 }
             });
-            //await page.close();
-            //await browser.close();
+            await page.close();
+            await browser.close();
             return result;
         }catch(err){
             console.log('insta crawl err : ', err);

@@ -18,7 +18,7 @@ module.exports = {
             .toFormat('mp4')
             .output(pt,{end: true})
             .on('progress', (p)=>{
-                console.log('create preview video process : ', p);
+                //console.log('create preview video process : ', p);
             })
             .on('error', (err, stdout, stderr)=>{
                 console.log("err : ", err);
