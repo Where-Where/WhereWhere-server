@@ -6,7 +6,7 @@ module.exports = {
         try{
             const username = myInfo.username;
             const password = myInfo.password;
-            const browser = await puppeteer.launch({headless: true});
+            const browser = await puppeteer.launch({headless: false});
             const page = await browser.newPage();
             await page.goto("https://www.instagram.com/");
             await page.waitForTimeout(2000);
@@ -85,8 +85,8 @@ module.exports = {
                     };
                 }
             });
-            await page.close();
-            await browser.close();
+            //await page.close();
+            //await browser.close();
             return result;
         }catch(err){
             console.log('insta crawl err : ', err);
