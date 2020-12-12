@@ -85,8 +85,8 @@ module.exports = {
                     };
                 }
             });
-            //await page.close();
-            //await browser.close();
+            await page.close();
+            await browser.close();
             return result;
         }catch(err){
             console.log('insta crawl err : ', err);

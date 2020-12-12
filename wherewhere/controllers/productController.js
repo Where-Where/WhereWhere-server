@@ -297,7 +297,7 @@ module.exports = {
                 const newFileName = randomString.generate(17);
                 var cnt = 0;
                 var pluralTF = false;
-                console.log(writer, content, datas);
+                //console.log(writer, content, datas);
                 datas.forEach(async (element)=>{
                     cnt+=1;
                     if(cnt>=2){
@@ -381,8 +381,8 @@ module.exports = {
                         callback()
                     }
                     func(originDatas, resizedDatas, async function(){
-                        console.log('originDataOrderd : ', originDataOrdered);
-                        console.log('resizedDataOrdered : ', resizedDataOrdered);
+                        //console.log('originDataOrderd : ', originDataOrdered);
+                        //console.log('resizedDataOrdered : ', resizedDataOrdered);
                         const result = await productModel.register({
                             siteUrl: siteUrl,
                             dataUrl: originDataOrdered,
