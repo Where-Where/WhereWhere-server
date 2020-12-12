@@ -412,7 +412,7 @@ module.exports = {
                         });
                         return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.REGISTER_SUCCESS_INSTA, result));
                     })
-                }, 8000);
+                }, 15000);
             }
         }catch(err){
             console.log("인스타그램 크롤링 혹은 사진 저장 중 에러 발생, 캡처한 사진으로 저장한다.");
