@@ -294,6 +294,8 @@ module.exports = {
                 //console.log('writer, content, datas : ', writer, content, datas);
                 const originDatas = {};
                 const resizedDatas = {};
+                const originVidDatas = {};
+                const resizedVidDatas = {};
                 const newFileName = randomString.generate(17);
                 var cnt = 0;
                 var pluralTF = false;
@@ -330,13 +332,36 @@ module.exports = {
                         });
                     }else{//비디오 저장
                         try{
+                            
                             const returnVid = await downloadModuleVid.download(element["url"], newFileName, cnt);
                             //console.log('returnVid : ', returnVid);
                             const inputPath = returnVid["location"];//original vid url
                             const filename = inputPath.split('original/')[1];
+                            /*
+                            resizedDatas[filename] = {
+                                category: "video",
+                                url : `${filename}`
+                            };
+                            originDatas[filename] = {
+                                category: "video",
+                                url: `${filename}`
+                            };
+                            */
                             const ffmpegResult = await ffmpegController.createPreviewVideo(inputPath);
                             //console.log('ffmpegResult : ', ffmpegResult);
+                            
                             const thumbVidUrl = ffmpegResult["Location"];
+                            /*
+                            originVidDatas[filename] = {
+                                category: "video",
+                                url : `${inputPath}`
+                            };
+                            resizedVidDatas[filename] = {
+                                category: "video",
+                                url : `${thumbVidUrl}`
+                            }
+                            */
+                            
                             resizedDatas[filename] = {
                                 category: "video",
                                 url: `${thumbVidUrl}`
@@ -345,16 +370,7 @@ module.exports = {
                                 category: "video",
                                 url: `${inputPath}`
                             };
-                            /*
-                            originDatas.push({
-                                category: "video",
-                                url: `${inputPath}`
-                            });
-                            resizedDatas.push({
-                                category: "video",
-                                url: `${thumbVidUrl}`
-                            });
-                            */
+                            
                         }catch(err){
                             console.log('ffmpeg vid error : ', err);
                             throw err;
@@ -365,6 +381,8 @@ module.exports = {
                     //console.log('resizedData : ', resizedDatas);
                 });
                 setTimeout(async function(){
+                    console.log('originDatas : ', originDatas);
+                    console.log('resizedDatas : ', resizedDatas);
                     const originDataOrdered = [];
                     const resizedDataOrdered = [];
                     const func = function(originDatas, resizedDatas, callback){
@@ -394,31 +412,7 @@ module.exports = {
                         });
                         return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.REGISTER_SUCCESS_INSTA, result));
                     })
-                    /*
-                    const originDataOrdered = [];
-                    const originKeys = Object.keys(originDatas).sort();
-                    originKeys.forEach((key)=>{
-                        originDataOrdered.push(originDatas[key])
-                    });
-                    const resizedDataOrdered = [];
-                    const resizedKeys = Object.keys(resizedDatas).sort();
-                    resizedKeys.forEach((key)=>{
-                        resizedDataOrdered.push(resizedDatas[key])
-                    });
-                    
-                    const result = await productModel.register({
-                        siteUrl: siteUrl,
-                        dataUrl: originDataOrdered,
-                        resizedDataUrl: resizedDataOrdered,
-                        writer: writer,
-                        description: content,
-                        plural: pluralTF,
-                        userIdx: _id
-                    });
-                    return res.status(statusCode.OK).send(util.success(statusCode.OK, resMessage.REGISTER_SUCCESS_INSTA, result));
-                    */
-                    
-                }, 4000);
+                }, 8000);
             }
         }catch(err){
             console.log("인스타그램 크롤링 혹은 사진 저장 중 에러 발생, 캡처한 사진으로 저장한다.");
