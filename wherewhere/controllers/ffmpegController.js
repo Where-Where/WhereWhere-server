@@ -1,6 +1,6 @@
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const ffmpeg = require('fluent-ffmpeg');
-//ffmpeg.setFfmpegPath(ffmpegPath);
+ffmpeg.setFfmpegPath(ffmpegPath);
 const AWS = require('aws-sdk');
 AWS.config.loadFromPath(__dirname+'/../config/s3.json');
 const S3 = new AWS.S3({region: 'ap-northeast-2'});
@@ -11,7 +11,7 @@ module.exports = {
         let pt = new stream.PassThrough();
         const fileName = inputPath.split('original/')[1];
         ffmpeg(inputPath)
-            .setFfmpegPath(ffmpegPath)
+            //.setFfmpegPath(ffmpegPath)
             .inputOptions('-ss 0')
             .outputOptions('-t 4')
             .outputOptions('-movflags frag_keyframe+empty_moov')

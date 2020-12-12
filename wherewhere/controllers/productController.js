@@ -377,12 +377,12 @@ module.exports = {
                         }
                         
                     }
-                    //console.log('originDatas : ', originDatas);
-                    //console.log('resizedData : ', resizedDatas);
+                    console.log('a originDatas : ', originDatas);
+                    console.log('a resizedData : ', resizedDatas);
                 });
                 setTimeout(async function(){
-                    console.log('originDatas : ', originDatas);
-                    console.log('resizedDatas : ', resizedDatas);
+                    console.log('b originDatas : ', originDatas);
+                    console.log('b resizedDatas : ', resizedDatas);
                     const originDataOrdered = [];
                     const resizedDataOrdered = [];
                     const func = function(originDatas, resizedDatas, callback){
