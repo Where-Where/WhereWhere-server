@@ -7,8 +7,13 @@ module.exports = {
             const username = myInfo.username;
             const password = myInfo.password;
             const browser = await puppeteer.launch({headless: false});
-            await browser.userAgent(userAgent.userAgent);
+            //await browser.userAgent(userAgent.userAgent);
             const page = await browser.newPage();
+            //await page.setUserAgent(userAgent.userAgent);
+            await page.setExtraHTTPHeaders({
+                "User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit 537.36 (KHTML, like Gecko) Chrome",
+                "Accept":"text/html,application/xhtml+xml,application/xml; q=0.9,imgwebp,*/*;q=0.8"
+            });
             
             
             await page.goto("https://www.instagram.com/");
