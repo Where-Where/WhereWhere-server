@@ -23,6 +23,7 @@ module.exports = {
             await page.goto(requestUrl);
             // 크롤링
             */
+            await page.waitForTimeout(3000);//
             await page.goto(requestUrl);//
             await page.waitForSelector("article:first-of-type");
     
