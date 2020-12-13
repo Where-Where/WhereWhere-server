@@ -8,6 +8,7 @@ module.exports = {
             const password = myInfo.password;
             const browser = await puppeteer.launch({headless: false});
             const page = await browser.newPage();
+            /*
             await page.goto("https://www.instagram.com/");
             await page.waitForTimeout(2000);
             //로그인
@@ -21,6 +22,8 @@ module.exports = {
             await page.waitForTimeout(3000);
             await page.goto(requestUrl);
             // 크롤링
+            */
+            await page.goto(requestUrl);//
             await page.waitForSelector("article:first-of-type");
     
     
