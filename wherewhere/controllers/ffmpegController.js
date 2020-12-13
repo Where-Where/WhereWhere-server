@@ -1,6 +1,7 @@
-//const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
 const ffmpeg = require('fluent-ffmpeg');
-//ffmpeg.setFfmpegPath(ffmpegPath);
+ffmpeg.setFfmpegPath(ffmpegInstaller.path)
+//const ffmpeg = require('fluent-ffmpeg');
 const AWS = require('aws-sdk');
 AWS.config.loadFromPath(__dirname+'/../config/s3.json');
 const S3 = new AWS.S3({region: 'ap-northeast-2'});
