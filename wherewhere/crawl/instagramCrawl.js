@@ -1,13 +1,15 @@
 const puppeteer = require('puppeteer');
 const myInfo = require('../config/instagramInfo.json');
-
+const userAgent = require('../config/userAgent.json');
 module.exports = {
     crawler: async(requestUrl)=>{
         try{
             const username = myInfo.username;
             const password = myInfo.password;
             const browser = await puppeteer.launch({headless: false});
+            await browser.userAgent(userAgent.userAgent);
             const page = await browser.newPage();
+            
             /*
             await page.goto("https://www.instagram.com/");
             await page.waitForTimeout(2000);
@@ -23,6 +25,7 @@ module.exports = {
             await page.goto(requestUrl);
             // 크롤링
             */
+            
             await page.waitForTimeout(3000);//
             await page.goto(requestUrl);//
             await page.waitForSelector("article:first-of-type");
