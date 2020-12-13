@@ -10,9 +10,10 @@ module.exports = {
             await browser.userAgent(userAgent.userAgent);
             const page = await browser.newPage();
             
-            /*
+            
             await page.goto("https://www.instagram.com/");
             await page.waitForTimeout(2000);
+            console.log(await page.evaluate('navigator.userAgent'));    
             //로그인
             await page.type('input[name="username"]', username, {delay: 50});
             await page.type('input[name="password"]', password, {delay: 50});
@@ -24,10 +25,10 @@ module.exports = {
             await page.waitForTimeout(3000);
             await page.goto(requestUrl);
             // 크롤링
-            */
             
-            await page.waitForTimeout(3000);//
-            await page.goto(requestUrl);//
+            
+            //await page.waitForTimeout(3000);//
+            //await page.goto(requestUrl);//
             await page.waitForSelector("article:first-of-type");
     
     
