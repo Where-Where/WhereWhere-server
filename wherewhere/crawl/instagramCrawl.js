@@ -10,15 +10,12 @@ module.exports = {
             //await browser.userAgent(userAgent.userAgent);
             const page = await browser.newPage();
             //await page.setUserAgent(userAgent.userAgent);
-            await page.setExtraHTTPHeaders({
-                "User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit 537.36 (KHTML, like Gecko) Chrome",
-                "Accept":"text/html,application/xhtml+xml,application/xml; q=0.9,imgwebp,*/*;q=0.8"
-            });
+            
             
             
             await page.goto("https://www.instagram.com/");
             await page.waitForTimeout(2000);
-            console.log(await page.evaluate('navigator.userAgent'));    
+            //console.log(await page.evaluate('navigator.userAgent'));    
             //로그인
             await page.type('input[name="username"]', username, {delay: 50});
             await page.type('input[name="password"]', password, {delay: 50});
